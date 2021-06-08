@@ -36,6 +36,7 @@ func TestNoDeadlockOnError(t *testing.T) {
 		PingFunc: func() (*osquery.ExtensionStatus, error) {
 			return &osquery.ExtensionStatus{}, nil
 		},
+		CloseFunc: func() () {},
 	}
 	server := &ExtensionManagerServer{
 		serverClient: mock,
@@ -70,6 +71,7 @@ func TestShutdownWhenPingFails(t *testing.T) {
 			// As if the socket was closed
 			return nil, syscall.EPIPE
 		},
+		CloseFunc: func() () {},
 	}
 	server := &ExtensionManagerServer{
 		serverClient: mock,
@@ -104,6 +106,7 @@ func testShutdownDeadlock(t *testing.T) {
 		RegisterExtensionFunc: func(info *osquery.InternalExtensionInfo, registry osquery.ExtensionRegistry) (*osquery.ExtensionStatus, error) {
 			return &osquery.ExtensionStatus{Code: 0, UUID: retUUID}, nil
 		},
+		CloseFunc: func() () {},
 	}
 	server := ExtensionManagerServer{serverClient: mock, sockPath: tempPath.Name()}
 
@@ -172,6 +175,7 @@ func TestShutdownBasic(t *testing.T) {
 		RegisterExtensionFunc: func(info *osquery.InternalExtensionInfo, registry osquery.ExtensionRegistry) (*osquery.ExtensionStatus, error) {
 			return &osquery.ExtensionStatus{Code: 0, UUID: retUUID}, nil
 		},
+		CloseFunc: func() () {},
 	}
 	server := ExtensionManagerServer{serverClient: mock, sockPath: tempPath.Name()}
 

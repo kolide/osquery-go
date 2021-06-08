@@ -191,6 +191,11 @@ func (s *ExtensionManagerServer) Run() error {
 		for {
 			time.Sleep(s.pingInterval)
 
+			// can't ping if s.Shutdown has already happened
+			if s.serverClient == nil {
+				break
+			}
+
 			status, err := s.serverClient.Ping()
 			if err != nil {
 				errc <- errors.Wrap(err, "extension ping failed")
@@ -256,6 +261,12 @@ func (s *ExtensionManagerServer) Shutdown(ctx context.Context) error {
 		go func() {
 			server.Stop()
 		}()
+	}
+
+	// Also close the client that is attached to the osquery hosted pipe
+	if s.serverClient != nil {
+		s.serverClient.Close()
+		s.serverClient = nil
 	}
 
 	return nil
