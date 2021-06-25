@@ -101,6 +101,9 @@ func NewExtensionManagerServer(name string, sockPath string, opts ...ServerOptio
 
 	serverClient, err := NewClient(sockPath, manager.timeout)
 	if err != nil {
+		if serverClient != nil {
+			serverClient.Close()
+		}
 		return nil, err
 	}
 	manager.serverClient = serverClient
